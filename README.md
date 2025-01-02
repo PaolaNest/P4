@@ -66,7 +66,7 @@ El script convierte un archivo WAV en un archivo LPC comprimido, que contiene lo
   
 Primero se determina el número de columnas del fichero de salida y el valor lpc_order que representa el orden del análisis LPC. Luego, se suma 1 para incluir el coeficiente de ganancia (gain) en la primera columna.
 
-En la siguiente linea se utiliza el comando $X2X +fa para convertir los datos LPC almacenados en formato binario a texto flotante (ASCII). A demás, los datos se leen desde el archivo $base.lp, que contiene los coeficientes LPC generados por SPTK.
+En la siguiente linea se utiliza el comando $X2X +fa para convertir los datos LPC almacenados en formato binario a texto flotante (ASCII). A demás, los datos se leen desde el archivo $base.lp, que contiene los coeficientes LPC generados por SPTK.<br>
 wc -l cuenta el número de líneas (valores) en el archivo convertido.
 Posteriormente, se divide el número total de valores entre ncol (número de columnas) para calcular el número de filas. Esta división garantiza que cada fila tenga exactamente ncol valores.
 
