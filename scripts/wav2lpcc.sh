@@ -17,7 +17,7 @@ cleanup() {
    \rm -f $base.*
 }
 
-if [[ $# != 3 ]]; then
+if [[ $# != 3 ]]; then # si los argumentos son distintos de 3
    echo "$0 lpc_order input.wav output.lp"
    exit 1
 fi

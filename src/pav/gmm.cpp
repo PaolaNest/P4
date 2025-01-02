@@ -103,7 +103,7 @@ namespace upc
 	/// Computes the logprob for the whole input data.
 	float GMM::logprob(const fmatrix &data) const
 	{
-
+		//Cas d'ERROR: GMM mal definida o dimensions incorrectes
 		if (nmix == 0 or vector_size == 0 or vector_size != data.ncol())
 			return -1e38F;
 
@@ -112,6 +112,8 @@ namespace upc
 
 		for (n=0; n<data.nrow(); ++n) {
 			/// \TODO Compute the logprob of a single frame of the input data; you can use gmm_logprob() above.
+			/// \DONE
+			lprob += gmm_logprob(data[n]);
 		}
 		return lprob/data.nrow();
 	}
@@ -207,14 +209,41 @@ namespace upc
 		fmatrix weights(data.nrow(), nmix);
 		for (iteration=0; iteration<max_it; ++iteration) {
 			/// \TODO
+			/// \DONE
 			// Complete the loop in order to perform EM, and implement the stopping criterion.
 			//
 			// EM loop: em_expectation + em_maximization.
 			//
 			// Update old_prob, new_prob and inc_prob in order to stop the loop if logprob does not
 			// increase more than inc_threshold.
-			if (verbose & 01)
-				cout << "GMM nmix=" << nmix << "\tite=" << iteration << "\tlog(prob)=" << new_prob << "\tinc=" << inc_prob << endl;
+
+			//FASE EXPECTATION
+			//Calcula la prob. logarítmica total de la ite actual: 
+			new_prob = em_expectation(data, weights);
+
+			//FASE MAXIMIZATION
+			em_maximization(data, weights);		
+
+			//Calculem la millora
+			inc_prob = new_prob - old_prob;
+			
+			if (verbose & 01){
+				cout << "GMM nmix=" << nmix 
+					 << "\tite=" << iteration 
+					 << "\tlog(prob)=" << new_prob 
+					 << "\tinc=" << inc_prob << endl;
+			}
+
+			if(inc_prob < inc_threshold){
+				if (verbose & 01) {
+                	cout << "Converged after " << iteration + 1 << " iterations.\n";
+            	}
+            	break;
+			}
+
+			//Actualitzem per la pròxima ite
+			old_prob = new_prob;
+
 		}
 		return 0;
 	}

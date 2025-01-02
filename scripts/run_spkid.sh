@@ -78,7 +78,7 @@ fi
 
 compute_lp() {
     db=$1
-    shift
+    shift 
     for filename in $(sort $*); do
 		mkdir -p $(dirname $w/$FEAT/$filename.$FEAT)
         EXEC="wav2lp 8 $db/$filename.wav $w/$FEAT/$filename.$FEAT"
@@ -86,10 +86,20 @@ compute_lp() {
     done
 }
 
+compute_lpcc() {
+    db=$1
+    shift 
+    for filename in $(sort $*); do
+		mkdir -p $(dirname $w/$FEAT/$filename.$FEAT)
+        EXEC="wav2lpcc 8 $db/$filename.wav $w/$FEAT/$filename.$FEAT"
+        echo $EXEC && $EXEC || exit 1
+    done
+}
+
 #  Set the name of the feature (not needed for feature extraction itself)
-if [[ ! -v FEAT && $# > 0 && "$(type -t compute_$1)" = function ]]; then
+if [[ "$FEAT" == "" && $# > 0 && "$(type -t compute_$1)" = function ]]; then
     FEAT=$1
-elif [[ ! -v FEAT ]]; then
+elif [[ "$FEAT" == "" ]]; then
     echo "Variable FEAT not set. Please rerun with FEAT set to the desired feature."
     echo
     echo "For instance:"
@@ -113,7 +123,7 @@ for cmd in $*; do
        for dir in $db_devel/BLOCK*/SES* ; do
            name=${dir/*\/}
            echo $name ----
-           EXEC="gmm_train -v 1 -T 0.001 -N 5 -m 1 -d $w/$FEAT -e $FEAT -g $w/gmm/$FEAT/$name.gmm $lists/class/$name.train"
+           EXEC="gmm_train -v 1 -T 0.0001 -N 20 -m 5 -d $w/$FEAT -e $FEAT -g $w/gmm/$FEAT/$name.gmm $lists/class/$name.train"
            echo $EXEC && $EXEC || exit 1
            echo
        done
@@ -150,7 +160,8 @@ for cmd in $*; do
        #   For instance:
        #   * <code> gmm_verify ... > $LOG_VERIF </code>
        #   * <code> gmm_verify ... | tee $LOG_VERIF </code>
-       echo "Implement the verify option ..."
+       EXEC="gmm_verify -d $w/FEAT -e $FEAT -D $w/gmm/$FEAT -E gmm $lists/gmm.list $lists/verif/all.test $lists/verif/all.test.candidates"
+        echo $EXEC && $EXEC | tee $LOG_VERIF || exit 1
 
    elif [[ $cmd == verifyerr ]]; then
        if [[ ! -s $LOG_VERIF ]] ; then
