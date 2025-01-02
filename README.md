@@ -74,11 +74,25 @@ El formato fmatrix requiere un encabezado con el número de filas y columnas, po
 
   * ¿Por qué es más conveniente el formato *fmatrix* que el SPTK?
 
+El formato fmatrix es más conveniente que el formato nativo de SPTK por varias razones: <br>
+→ 1a: es autodescriptivo ya que incluye un encabezado que especifica el número de filas y columnas de la matriz. <br>
+→ 2a: es portable, ya que sigue un esquema binario simple y bien definido (encabezado + datos). <br>
+→ 3a: es fácil de usar con herramientas externas. <br>
+→ 4a: organiza los datos en un formato matricial bien definido, lo que facilita su uso en algoritmos de machine learning, análisis estadístico o visualización. <br>
+→ 5a: reduce errores al incluir información estructural explícita. <br>
+    
 - Escriba el *pipeline* principal usado para calcular los coeficientes cepstrales de predicción lineal
   (LPCC) en su fichero <code>scripts/wav2lpcc.sh</code>:
 
+  ![image](https://github.com/user-attachments/assets/b5ac1e0c-6a1e-4622-8501-629d3cbf2484)
+
+
+
 - Escriba el *pipeline* principal usado para calcular los coeficientes cepstrales en escala Mel (MFCC) en su
   fichero <code>scripts/wav2mfcc.sh</code>:
+
+  ![image](https://github.com/user-attachments/assets/1ff77b74-abaf-4fdc-bf2c-19af4e9c9483)
+
 
 ### Extracción de características.
 
