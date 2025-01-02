@@ -35,24 +35,28 @@ ejercicios indicados.
 
 Este script tiene como objetivo realizar una extracción de características LPC (Linear Predictive Coding) a partir de un archivo de audio en formato WAV. Este proceso utiliza herramientas de la biblioteca SPTK (Speech Signal Processing Toolkit) y se realiza mediante una canalización (pipeline) de comandos.
 
--*Comando SOX*: Convierte el archivo de entrada en formato WAV ($inputfile) a un flujo de datos de audio sin procesar en formato RAW.
+-**Comando SOX**: Convierte el archivo de entrada en formato WAV ($inputfile) a un flujo de datos de audio sin procesar en formato RAW.
+
 -t raw:  formato de salida será RAW (datos binarios sin encabezado).
 -e signed: datos de audio serán enteros con signo.
 -b 16: cada muestra de audio tiene un tamaño de 16 bits (profundidad).
 -: la salida será enviada al flujo estándar (stdout), para que pueda ser utilizada en la canalización.
 
--*Comando $X2X*: Convierte los datos binarios RAW generados por sox en números de coma flotante (formato requerido para el procesamiento posterior).  (+sf -> single-precision floating-point)
+-**Comando $X2X**: Convierte los datos binarios RAW generados por sox en números de coma flotante (formato requerido para el procesamiento posterior).  (+sf -> single-precision floating-point)
 
--*Comando $FRAME*: Divide los datos de audio en frames de longitud constante, permitiendo que cada uno sea procesado independientemente.
+-**Comando $FRAME**: Divide los datos de audio en frames de longitud constante, permitiendo que cada uno sea procesado independientemente.
+
 -l 240: Define la longitud de cada frame como 240 muestras (30 ms con una frecuencia de muestreo de 8 kHz).
 -p 80: Establece un desplazamiento (overlap) entre frames de 80 muestras (10 ms).
 
--*Comando $WINDOW*: Se enventana la señal con los parámetros especificados a continuación.
+-**Comando $WINDOW**: Se enventana la señal con los parámetros especificados a continuación.
+
 -l 240: longitud de la señal de entrada (240 muestras).
 -L 240: longitud de la ventana (también 240 muestras).
 
--*Comando $LPC*: Realiza el análisis LPC sobre cada frame para obtener los coeficientes lineales predictivos. Estos coeficientes representan de forma compacta el espectro del audio.
-   -l 240: Longitud de la señal de entrada (240 muestras por frame).
+-**Comando $LPC**: Realiza el análisis LPC sobre cada frame para obtener los coeficientes lineales predictivos. Estos coeficientes representan de forma compacta el espectro del audio.
+
+-l 240: Longitud de la señal de entrada (240 muestras por frame).
 -m $lpc_order: Orden del análisis LPC (número de coeficientes).
 
 
