@@ -101,6 +101,24 @@ El formato fmatrix es más conveniente que el formato nativo de SPTK por varias 
   
   + Indique **todas** las órdenes necesarias para obtener las gráficas a partir de las señales 
     parametrizadas.
+
+→ Parametrización **LP**:
+![image](https://github.com/user-attachments/assets/32d17151-e333-455a-9505-3d0eaa4780db)
+
+![Extract_caract_lp](https://github.com/user-attachments/assets/b8b7e807-b59c-49ec-93e1-ecf3d2c25f5d)
+
+
+→ Parametrización **LPCC**:
+![image](https://github.com/user-attachments/assets/ca789bcb-ea06-4b90-9a14-e0907c429956)
+
+![Extract_Caract_lppc](https://github.com/user-attachments/assets/8e7d7ed4-a56b-4e66-86b8-60dac1f104d5)
+
+
+→ Parametrización **MFCC**:
+
+![image](https://github.com/user-attachments/assets/d69c8f89-2cf1-4292-8b5b-69c6fe99b092)
+
+
   + ¿Cuál de ellas le parece que contiene más información?
 
 - Usando el programa <code>pearson</code>, obtenga los coeficientes de correlación normalizada entre los
