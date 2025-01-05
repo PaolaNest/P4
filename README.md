@@ -119,17 +119,30 @@ El formato fmatrix es más conveniente que el formato nativo de SPTK por varias 
 ![image](https://github.com/user-attachments/assets/d69c8f89-2cf1-4292-8b5b-69c6fe99b092)
 
 
+
+
   + ¿Cuál de ellas le parece que contiene más información?
+
+Los coeficientes LPCC son una transformación cepstral de los LPC. Esta transformación tiene el efecto de reducir la correlación entre las características y los LPCC tienden a contener más información relevante y diferenciada, ya que capturan tanto la envolvente espectral como sus variaciones de una manera más decorrelacionada.
+
+Los coeficientes cepstrales en la escala Mel están diseñados explícitamente para reducir las correlaciones entre sí después de una transformación en el dominio de frecuencias. Generalmente, tienen los coeficientes menos correlacionados entre estas tres técnicas.
+
+En conclusión, la gráfica asociada con los MFCC (última gráfica) contiene más información, ya que los coeficientes están más inorrelados en comparación con los LP y LPCC.
 
 - Usando el programa <code>pearson</code>, obtenga los coeficientes de correlación normalizada entre los
   parámetros 2 y 3 para un locutor, y rellene la tabla siguiente con los valores obtenidos.
 
+![image](https://github.com/user-attachments/assets/cb67603b-0b7f-46c4-84b4-ad74bd39153c)
+
+
   |                        | LP   | LPCC | MFCC |
   |------------------------|:----:|:----:|:----:|
-  | &rho;<sub>x</sub>[2,3] |      |      |      |
+  | &rho;<sub>x</sub>[2,3] |  -0.71    |   0.31   |   0.21   |
   
   + Compare los resultados de <code>pearson</code> con los obtenidos gráficamente.
   
+Los valores obtenidos para ρx[2,3] nos indican el nivel de correlación entre los coeficientes 2 y 3, donde el que tiene una mayor correlación es aquel que tiene un valor más cercano al 1. 
+De la tabla superior, vemos que, en valor absoluto, para LP obtenemos un valor más cercano a 1, por lo que éste aporta menos información. Por otro lado, LPCC y MFCC son menores y están más cerca del 0, por lo que sus coeficientes son más incorrelados entre sí y, de este modo, podemos decir que aportan más información. Siendo aún más precisas, podemos ver como los coeficientes MFCC son ligeramente más incorrelados que los de LPCC. Dicho esto, los resultados pearson concuerdan con los resultados gráficosobtenidos anteriormente.
 - Según la teoría, ¿qué parámetros considera adecuados para el cálculo de los coeficientes LPCC y MFCC?
 
 ### Entrenamiento y visualización de los GMM.
