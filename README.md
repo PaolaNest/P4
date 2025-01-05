@@ -118,6 +118,9 @@ El formato fmatrix es más conveniente que el formato nativo de SPTK por varias 
 
 ![image](https://github.com/user-attachments/assets/d69c8f89-2cf1-4292-8b5b-69c6fe99b092)
 
+![Extract_caract_mfcc](https://github.com/user-attachments/assets/f20401a0-f012-4690-b61a-c1a7f46ed798)
+
+
 
 
 
@@ -132,18 +135,20 @@ En conclusión, la gráfica asociada con los MFCC (última gráfica) contiene m�
 - Usando el programa <code>pearson</code>, obtenga los coeficientes de correlación normalizada entre los
   parámetros 2 y 3 para un locutor, y rellene la tabla siguiente con los valores obtenidos.
 
-![image](https://github.com/user-attachments/assets/cb67603b-0b7f-46c4-84b4-ad74bd39153c)
+![image](https://github.com/user-attachments/assets/324a6b73-4386-4a18-b25f-2cc8a5cb1bf2)
+
 
 
   |                        | LP   | LPCC | MFCC |
   |------------------------|:----:|:----:|:----:|
-  | &rho;<sub>x</sub>[2,3] |  -0.71    |   0.31   |   0.21   |
+  | &rho;<sub>x</sub>[2,3] |  -0.71    |   0.31   |   0.11   |
   
   + Compare los resultados de <code>pearson</code> con los obtenidos gráficamente.
   
 Los valores obtenidos para ρx[2,3] nos indican el nivel de correlación entre los coeficientes 2 y 3, donde el que tiene una mayor correlación es aquel que tiene un valor más cercano al 1. 
 De la tabla superior, vemos que, en valor absoluto, para LP obtenemos un valor más cercano a 1, por lo que éste aporta menos información. Por otro lado, LPCC y MFCC son menores y están más cerca del 0, por lo que sus coeficientes son más incorrelados entre sí y, de este modo, podemos decir que aportan más información. Siendo aún más precisas, podemos ver como los coeficientes MFCC son ligeramente más incorrelados que los de LPCC. Dicho esto, los resultados pearson concuerdan con los resultados gráficosobtenidos anteriormente.
 - Según la teoría, ¿qué parámetros considera adecuados para el cálculo de los coeficientes LPCC y MFCC?
+Para LPCC: Cada orden 2 equivale a 1 formante; los dos primeros formantes son esenciales, el 3ro añade naturalidad y los demás son características del locutor. Si el orden muy elevado -> Info que no es relevante para el reconocimiento. Si quiero 5-6 resonancias, con orden 10, 12, 14 o incluso 16 es suficiente. En nuestro caso, -m 16 -> 17 coeficientes
 
 ### Entrenamiento y visualización de los GMM.
 
