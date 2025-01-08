@@ -1,10 +1,8 @@
 #!/bin/bash
 
-# Make pipeline return code the last non-zero one or zero if all the commands return zero.
 set -o pipefail
 
 ## \file
-## \TODO This file implements a very trivial feature extraction; use it as a template for other front ends.
 ## 
 ## Please, read SPTK documentation and some papers in order to implement more advanced front ends.
 
@@ -17,41 +15,42 @@ cleanup() {
    \rm -f $base.*
 }
 
-if [[ $# != 4 ]]; then # si los argumentos son distintos de 3
-   echo "$0 lpc_order lpcc_order input.wav output.lp"
+if [[ $# != 5 ]]; then
+   echo "$0 fm mfcc_order mel_filterbank_order input.wav output.mfcc"
    exit 1
 fi
 
-lpc_order=$1
-lpcc_order=$2
-inputfile=$3
-outputfile=$4
+fm=$1
+mfcc_order=$2
+mel_filterbank_order=$3
+inputfile=$4
+outputfile=$5
 
-if [[ $UBUNTU_SPTK == 1 ]]; then
+
+if [[ 1 ]]; then
    # In case you install SPTK using debian package (apt-get)
    X2X="sptk x2x"
    FRAME="sptk frame"
    WINDOW="sptk window"
-   LPC="sptk lpc"
-   LPCC="sptk lpc2c"
+   MFCC="sptk mfcc"
 else
    # or install SPTK building it from its source
    X2X="x2x"
    FRAME="frame"
    WINDOW="window"
-   LPC="lpc"
-   LPCC="sptk lpc2c"
+   MFCC="mfcc"
 fi
 
 # Main command for feature extration
 sox $inputfile -t raw -e signed -b 16 - | $X2X +sf | $FRAME -l 240 -p 80 | $WINDOW -l 240 -L 240 |
-	$LPC -l 240 -m $lpc_order | $LPCC -m $lpc_order -M $lpcc_order > $base.lpcc || exit 1
+	$MFCC -s $fm -l 240 -m $mfcc_order -n $mel_filterbank_order > $base.mfcc
    
-
 # Our array files need a header with the number of cols and rows:
-ncol=$((lpcc_order + 1)) 
-nrow=$(($($X2X +fa < $base.lpcc | wc -l) / ncol))
+ncol=$((mfcc_order)) 
+nrow=`$X2X +fa < $base.mfcc | wc -l | perl -ne 'print $_/'$ncol', "\n";'`
 
 # Build fmatrix file by placing nrow and ncol in front, and the data after them
 echo $nrow $ncol | $X2X +aI > $outputfile
-cat $base.lpcc >> $outputfile
+cat $base.mfcc >> $outputfile
+
+exit

@@ -18,10 +18,11 @@ set -o pipefail
 # - db_devel: directory of the speecon database used during development
 # - db_test:  directory of the database used in the final test
 lists=lists
-w=work
+w=work 
 name_exp=one
 db_devel=spk_8mu/speecon
 db_test=spk_8mu/sr_test
+world=users
 
 # Ficheros de resultados del reconocimiento y verificación
 LOG_CLASS=$w/class_${FEAT:-$1}_${name_exp}.log
@@ -72,34 +73,44 @@ fi
 # ----------------------------
 
 ## @file
-# \TODO
+# \DONE
 # Create your own features with the name compute_$FEAT(), where $FEAT is the name of the feature.
 # - Select (or change) different features, options, etc. Make you best choice and try several options.
 
 compute_lp() {
     db=$1
-    shift 
+    shift
     for filename in $(sort $*); do
-		mkdir -p $(dirname $w/$FEAT/$filename.$FEAT)
-        EXEC="wav2lp 8 $db/$filename.wav $w/$FEAT/$filename.$FEAT"
+        mkdir -p $(dirname $w/$FEAT/$filename.$FEAT)
+        EXEC="wav2lp 16 $db/$filename.wav $w/$FEAT/$filename.$FEAT" #orden LP
         echo $EXEC && $EXEC || exit 1
     done
 }
 
 compute_lpcc() {
-    db=$1
-    shift 
+    db_sen1=$1
+    shift
     for filename in $(sort $*); do
-		mkdir -p $(dirname $w/$FEAT/$filename.$FEAT)
-        EXEC="wav2lpcc 8 $db/$filename.wav $w/$FEAT/$filename.$FEAT"
+        mkdir -p $(dirname $w/$FEAT/$filename.$FEAT)
+        EXEC="wav2lpcc 30 30 $db_sen1/$filename.wav $w/$FEAT/$filename.$FEAT" #orden LPC y orden LPCC
+        echo $EXEC && $EXEC || exit 1
+    done
+}
+compute_mfcc() {
+    db_sen2=$1
+    shift
+    for filename in $(sort $*); do
+        mkdir -p $(dirname $w/$FEAT/$filename.$FEAT)
+        EXEC="wav2mfcc 8 16 24 $db_sen2/$filename.wav $w/$FEAT/$filename.$FEAT"  #Frecuencia de muestreo, orden del MFCC y orden del banco de filtros
         echo $EXEC && $EXEC || exit 1
     done
 }
 
+
 #  Set the name of the feature (not needed for feature extraction itself)
-if [[ "$FEAT" == "" && $# > 0 && "$(type -t compute_$1)" = function ]]; then
+if [[ ! -v FEAT && $# > 0 && "$(type -t compute_$1)" = function ]]; then
     FEAT=$1
-elif [[ "$FEAT" == "" ]]; then
+elif [[ ! -v FEAT ]]; then
     echo "Variable FEAT not set. Please rerun with FEAT set to the desired feature."
     echo
     echo "For instance:"
@@ -114,7 +125,7 @@ fi
 # ---------------------------------
 
 for cmd in $*; do
-	echo "$(date): $cmd '---'"
+   echo `date`: $cmd '---';
 
    if [[ $cmd == train ]]; then
        ## @file
@@ -123,7 +134,7 @@ for cmd in $*; do
        for dir in $db_devel/BLOCK*/SES* ; do
            name=${dir/*\/}
            echo $name ----
-           EXEC="gmm_train -v 1 -T 0.0001 -N 20 -m 5 -d $w/$FEAT -e $FEAT -g $w/gmm/$FEAT/$name.gmm $lists/class/$name.train"
+           EXEC="gmm_train -v 1 -T 0.015 -N 60 -m 55 -d $w/$FEAT -e $FEAT -g $w/gmm/$FEAT/$name.gmm $lists/class/$name.train"
            echo $EXEC && $EXEC || exit 1
            echo
        done
@@ -149,7 +160,8 @@ for cmd in $*; do
        # Implement 'trainworld' in order to get a Universal Background Model for speaker verification
        #
        # - The name of the world model will be used by gmm_verify in the 'verify' command below.
-       echo "Implement the trainworld option ..."
+       EXEC="gmm_train -v 1 -T 0.02 -N 35 -m 60 -d $w/$FEAT -e $FEAT -g $w/gmm/$FEAT/$world.gmm $lists/verif/$world.train"
+       echo $EXEC && $EXEC || exit 1   
 
    elif [[ $cmd == verify ]]; then
        ## @file
@@ -160,9 +172,11 @@ for cmd in $*; do
        #   For instance:
        #   * <code> gmm_verify ... > $LOG_VERIF </code>
        #   * <code> gmm_verify ... | tee $LOG_VERIF </code>
-       EXEC="gmm_verify -d $w/FEAT -e $FEAT -D $w/gmm/$FEAT -E gmm $lists/gmm.list $lists/verif/all.test $lists/verif/all.test.candidates"
-        echo $EXEC && $EXEC | tee $LOG_VERIF || exit 1
+       EXEC="gmm_verify -d $w/$FEAT -e $FEAT -D $w/gmm/$FEAT -w $world -E gmm $lists/gmm.list $lists/verif/all.test $lists/verif/all.test.candidates"
+    echo $EXEC; $EXEC | tee $LOG_VERIF || exit 1
 
+       EXEC="gmm_verify -d $w/$FEAT -e $FEAT -w $world -D $w/gmm/$FEAT $lists/gmm.list $lists/verif/all.test $lists/verif/all.test.candidates"
+       echo $EXEC ; $EXEC | tee $LOG_VERIF || exit 1 
    elif [[ $cmd == verifyerr ]]; then
        if [[ ! -s $LOG_VERIF ]] ; then
           echo "ERROR: $LOG_VERIF not created"
@@ -181,8 +195,13 @@ for cmd in $*; do
        #
        # El fichero con el resultado del reconocimiento debe llamarse $FINAL_CLASS, que deberá estar en el
        # directorio de la práctica (PAV/P4).
-       echo "To be implemented ..."
-   
+       compute_$FEAT $db_test $lists/final/class.test #Parametrizamos la base de datos
+
+       #(gmm_classify -d $w/$FEAT -e $FEAT -D $w/gmm/$FEAT -E gmm $lists/gmm.list  $lists/final/class.test | tee class_test.log) || exit 1
+
+       (gmm_classify -d $w/$FEAT -e $FEAT -D $w/gmm/$FEAT -E gmm $lists/gmm.list  $lists/final/class.test | tee $w/class_final_${FEAT}_${name_exp}.log) | tee class_test0.log || exit 1
+       cat class_test0.log | cut -f1,2 >class_test.log
+       rm class_test0.log
    elif [[ $cmd == finalverif ]]; then
        ## @file
        # \TODO
@@ -200,13 +219,19 @@ for cmd in $*; do
        # candidato para la señal a verificar. En $FINAL_VERIF se pide que la tercera columna sea 1,
        # si se considera al candidato legítimo, o 0, si se considera impostor. Las instrucciones para
        # realizar este cambio de formato están en el enunciado de la práctica.
-       echo "To be implemented ..."
-   
+       compute_$FEAT $db_test $lists/final/verif.test
+       EXEC="gmm_verify -d $w/$FEAT -e $FEAT -w $world -D $w/gmm/$FEAT $lists/gmm.list $lists/final/verif.test $lists/final/verif.test.candidates"
+       echo $EXEC ; $EXEC | tee $TEMP_VERIF || exit 1 
+
+       #seleccionar el umbral en el script de pearl
+       perl -ane 'print "$F[0]\t$F[1]\t";
+    if ($F[2] > 1.73) {print "1\n"}    
+    else {print "0\n"}' $TEMP_VERIF  | tee $FINAL_VERIF
    # If the command is not recognize, check if it is the name
    # of a feature and a compute_$FEAT function exists.
    elif [[ "$(type -t compute_$cmd)" = function ]]; then
        FEAT=$cmd
-       compute_$FEAT $db_devel $lists/class/all.train $lists/class/all.test || exit 1
+       compute_$FEAT $db_devel $lists/class/all.train $lists/class/all.test
 
    else
        echo "undefined command $cmd" && exit 1
